@@ -3,6 +3,7 @@
   ng-class="{'ui-grid-row-selected': row.isSelected}"
   ng-click="selectButtonClick(row, $event)"
   role="checkbox"
+  tabindex="{{grid.cellNav ? '-1' : undefined}}"
   ng-model="row.isSelected">
   &nbsp;
 </div>
