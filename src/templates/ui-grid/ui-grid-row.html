@@ -4,5 +4,6 @@
   class="ui-grid-cell"
   ng-class="{ 'ui-grid-row-header-cell': col.isRowHeader }"
   role="{{col.isRowHeader ? 'rowheader' : 'gridcell'}}"
+  aria-readonly="{{col.isRowHeader || !col.colDef.enableCellEdit ? true : undefined}}"
   ui-grid-cell>
 </div>
