@@ -4,6 +4,7 @@
   ng-click="selectButtonClick(row, $event)"
   ng-keydown="selectButtonKeyDown(row, $event)"
   role="checkbox"
+  tabindex="{{grid.cellNav ? '-1' : '0'}}"
   ng-model="row.isSelected">
   &nbsp;
 </div>
