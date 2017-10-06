@@ -55,7 +55,8 @@ describe('GridOptions factory', function () {
         gridMenuTemplate: 'ui-grid/uiGridMenu',
         menuButtonTemplate: 'ui-grid/ui-grid-menu-button',
         menuItemTemplate: 'ui-grid/uiGridMenuItem',
-        appScopeProvider: null
+        appScopeProvider: null,
+        columnHeaderKeyDownAction: 2
       });
     });
 
@@ -105,7 +106,10 @@ describe('GridOptions factory', function () {
         menuButtonTemplate: 'testMenuButton',
         menuItemTemplate: 'testMenuItem',
         extraOption: 'testExtraOption',
-        appScopeProvider : 'anotherRef'
+        appScopeProvider : 'anotherRef',
+        columnHeaderKeyDownAction: 0,
+        columnHeaderSpaceAction: 1,
+        columnHeaderReturnAction: 2 
       };
       expect( GridOptions.initialize(options) ).toEqual({
         onRegisterApi: testFunction,
@@ -152,7 +156,10 @@ describe('GridOptions factory', function () {
         menuButtonTemplate: 'testMenuButton',
         menuItemTemplate: 'testMenuItem',
         extraOption: 'testExtraOption',
-        appScopeProvider : 'anotherRef'
+        appScopeProvider : 'anotherRef',
+        columnHeaderKeyDownAction: 0,
+        columnHeaderSpaceAction: 1,
+        columnHeaderReturnAction: 2
       });
     });
 
@@ -199,9 +206,14 @@ describe('GridOptions factory', function () {
         gridFooterTemplate: 'testGridFooter',
         rowTemplate: 'testRow',
         gridMenuTemplate: 'testGridMenu',
+        extraOption: 'testExtraOption'
         menuButtonTemplate: 'testMenuButton',
         menuItemTemplate: 'testMenuItem',
         extraOption: 'testExtraOption'
+        extraOption: 'testExtraOption',
+        columnHeaderKeyDownAction: 1,
+        columnHeaderSpaceAction: 2,
+        columnHeaderReturnAction: 0
       };
       expect( GridOptions.initialize(options) ).toEqual({
         onRegisterApi: testFunction,
@@ -248,7 +260,10 @@ describe('GridOptions factory', function () {
         menuButtonTemplate: 'testMenuButton',
         menuItemTemplate: 'testMenuItem',
         extraOption: 'testExtraOption',
-        appScopeProvider : null
+        appScopeProvider : null,
+        columnHeaderKeyDownAction: 1,
+        columnHeaderSpaceAction: 2,
+        columnHeaderReturnAction: 0
       });
     });
   });
