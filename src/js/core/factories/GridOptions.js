@@ -596,6 +596,15 @@ angular.module('ui.grid')
        * @description this options overwrites the columnHeaderKeyDownAction option for the return key.
        */
 
+      /**
+       * @ngdoc object
+       * @name keyToAddSortColumns
+       * @propertyOf ui.grid.class:GridOptions
+       * @description this option specifies whether the adding of columns to the collection of sorted columns is enabled by pressing
+       * the shift key, the control key or either. This option takes any binary OR combination of SHIFT and CTRL from uiGridConstants.keyCombination.
+       */
+      baseOptions.keyToAddSortColumns = baseOptions.keyToAddSortColumns || uiGridConstants.keyCombination.SHIFT;
+
       return baseOptions;
     }
   };
