@@ -257,46 +257,53 @@ angular.module('ui.grid')
       function getColumnIcon(colDef) {
         return isColumnVisible(colDef) ? 'ui-grid-icon-ok' : 'ui-grid-icon-cancel';
       }
-
-      // add header for columns
-      showHideColumns.push({
-        title: i18nService.getSafeText('gridMenu.columns'),
-        order: 300,
-        templateUrl: 'ui-grid/ui-grid-menu-header-item'
-      });
-
-      $scope.grid.options.gridMenuTitleFilter = $scope.grid.options.gridMenuTitleFilter ? $scope.grid.options.gridMenuTitleFilter : function( title ) { return title; };
-
-      $scope.grid.options.columnDefs.forEach( function( colDef, index ) {
-        if ( colDef.enableHiding !== false ) {
-          // add hide menu item - shows an OK icon as we only show when column is already visible
-          var menuItem = {
-            icon: getColumnIcon(colDef),
-            action: function($event) {
-              $event.stopPropagation();
-
-              service.toggleColumnVisibility( this.context.gridCol );
-
-              if ($event.target && $event.target.firstChild) {
-                if (angular.element($event.target)[0].nodeName === 'I') {
-                  $event.target.className = getColumnIcon(this.context.gridCol.colDef);
-                }
-                else {
-                  $event.target.firstChild.className = getColumnIcon(this.context.gridCol.colDef);
-                }
-              }
-            },
-            shown: function() {
-              return this.context.gridCol.colDef.enableHiding !== false;
-            },
-            context: { gridCol: $scope.grid.getColumn(colDef.name || colDef.field) },
-            leaveOpen: true,
-            order: 301 + index
-          };
-          service.setMenuItemTitle( menuItem, colDef, $scope.grid );
-          showHideColumns.push( menuItem );
+      var noColumnsToHide = true;
+      $scope.grid.options.columnDefs.forEach( function( colDef, index ){
+        if ( colDef.enableHiding !== false ){
+          noColumnsToHide = false;
         }
-      });
+      } );
+
+      if ( !noColumnsToHide ) {
+
+        // add header for columns
+        showHideColumns.push({
+          title: i18nService.getSafeText('gridMenu.columns'),
+          order: 300
+        });
+
+        $scope.grid.options.gridMenuTitleFilter = $scope.grid.options.gridMenuTitleFilter ? $scope.grid.options.gridMenuTitleFilter : function( title ) { return title; };
+
+        $scope.grid.options.columnDefs.forEach( function( colDef, index ){
+          if ( colDef.enableHiding !== false ){
+            // add hide menu item - shows an OK icon as we only show when column is already visible
+            var menuItem = {
+              icon: getColumnIcon(colDef),
+              action: function($event) {
+                $event.stopPropagation();
+                service.toggleColumnVisibility( this.context.gridCol );
+                if ($event.target && $event.target.firstChild) {
+                  if (angular.element($event.target)[0].nodeName === 'I') {
+                    $event.target.className = getColumnIcon(this.context.gridCol.colDef);
+                  }
+                  else {
+                    $event.target.firstChild.className = getColumnIcon(this.context.gridCol.colDef);
+                  }
+                }
+              },
+              shown: function() {
+                return this.context.gridCol.colDef.enableHiding !== false;
+              },
+              context: { gridCol: $scope.grid.getColumn(colDef.name || colDef.field) },
+              leaveOpen: true,
+              order: 301 + index * 2
+            };
+            service.setMenuItemTitle( menuItem, colDef, $scope.grid );
+            showHideColumns.push( menuItem );
+		  }
+        });
+      }
+
       return showHideColumns;
     },
 
@@ -385,6 +392,13 @@ function (gridUtil, uiGridConstants, uiGridGridMenuService, i18nService) {
           $scope.$broadcast('show-menu');
           $scope.shown = true;
         }
+      };
+
+      $scope.handleKeyDown = function (event) {
+        if (event.keyCode === uiGridConstants.keymap.ENTER || event.keyCode === uiGridConstants.keymap.SPACE) {
+          event.preventDefault();
+          $scope.toggleMenu();
+        } 
       };
 
       $scope.$on('menu-hidden', function() {

@@ -3,9 +3,10 @@
        ui-grid-one-bind-id-grid="'grid-menu'"
        class="ui-grid-icon-container"
        ng-click="toggleMenu()"
+       ng-keyDown="handleKeyDown($event)"
        aria-haspopup="true">
     <i class="ui-grid-icon-menu"
-       ui-grid-one-bind-aria-label="i18n.aria.buttonLabel">&nbsp;</i>
+       ui-grid-one-bind-aria-label="i18n.aria.buttonLabel"></i>
   </div>
   <div ui-grid-menu menu-items="menuItems"></div>
 </div>
