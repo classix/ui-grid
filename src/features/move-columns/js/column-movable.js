@@ -71,10 +71,12 @@
             colMovable: {
               moveColumn: function (originalPosition, finalPosition) {
                 var columns = grid.columns;
+
                 if (!angular.isNumber(originalPosition) || !angular.isNumber(finalPosition)) {
                   gridUtil.logError('MoveColumn: Please provide valid values for originalPosition and finalPosition');
                   return;
                 }
+
                 var nonMovableColumns = 0;
                 for (var i = 0; i < columns.length; i++) {
                   if ((angular.isDefined(columns[i].colDef.visible) && columns[i].colDef.visible === false) || columns[i].isRowHeader === true) {
@@ -85,6 +87,7 @@
                   gridUtil.logError('MoveColumn: Invalid values for originalPosition, finalPosition');
                   return;
                 }
+
                 var findPositionForRenderIndex = function (index) {
                   var position = index;
                   for (var i = 0; i <= position; i++) {
@@ -118,6 +121,14 @@
          *  if their individual enableColumnMoving configuration is not defined. Defaults to true.
          */
         gridOptions.enableColumnMoving = gridOptions.enableColumnMoving !== false;
+        /**
+         *  @ngdoc object
+         *  @name enableColumnOrderVerification
+         *  @propertyOf  ui.grid.moveColumns.api:GridOptions
+         *  @description If false, disables the build-in column order verification and lets the user handle it. 
+         *  Turning this off can be useful with external paging. Defaults to true.
+         */
+        gridOptions.enableColumnOrderVerification = gridOptions.enableColumnOrderVerification !== false;
       },
       movableColumnBuilder: function (colDef, col, gridOptions) {
         var promises = [];
@@ -154,7 +165,12 @@
        * @description dataChangeCallback which uses the cached column order to restore the column order
        * when it is reset by altering the columnDefs array.
        */
-      verifyColumnOrder: function(grid) {
+      verifyColumnOrder: function(grid){
+
+        if (!grid.options.enableColumnOrderVerification) {
+          return;
+        }
+
         var headerRowOffset = grid.rowHeaderColumns.length;
         var newIndex;
 
@@ -173,7 +189,12 @@
           return;
         }
 
-        // check columns in between move-range to make sure they are visible columns
+        if (!columns[newPosition].colDef.enableColumnMoving || columns[newPosition].isRowHeader) {
+          this.redrawColumnAtPosition(grid, originalPosition, newPosition + 1);
+          return;
+        }
+
+        //check columns in between move-range to make sure they are visible columns
         var pos = (originalPosition < newPosition) ? originalPosition + 1 : originalPosition - 1;
         var i0 = Math.min(pos, newPosition);
         for (i0; i0 <= Math.max(pos, newPosition); i0++) {
