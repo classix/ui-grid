@@ -605,6 +605,16 @@ angular.module('ui.grid')
        */
       baseOptions.keyToAddSortColumns = baseOptions.keyToAddSortColumns || uiGridConstants.keyCombination.SHIFT;
 
+      /**
+       * @ngdoc object
+       * @name applySortOnColDefChange
+       * @propertyOf ui.grid.class:GridOptions
+       * @description this option specifies whether the sorting information of columns should always be changed, when the the sorting information
+       * in the corresponding column definitions has been changed. Per default, this option is set to false and sorting information is only taken from
+       * the definitions on columns creation. Changing this option to true could be however useful in some cases of external sorting. 
+       */
+      baseOptions.applySortOnColDefChange = typeof baseOptions.applySortOnColDefChange !== 'undefined' ? baseOptions.applySortOnColDefChange : false;
+
       return baseOptions;
     }
   };

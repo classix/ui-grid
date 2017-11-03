@@ -758,7 +758,7 @@ angular.module('ui.grid')
     self.setPropertyOrDefault(colDef, 'menuItems', []);
 
     // Use the column definition sort if we were passed it, but only if this is a newly added column
-    if ( isNew ) {
+    if ( self.grid.options.applySortOnColDefChange || isNew ){
       self.setPropertyOrDefault(colDef, 'sort');
     }
 
