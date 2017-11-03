@@ -9,6 +9,23 @@ angular.module('ui.grid')
    *  @description Methods for working with the grid menu
    */
 
+   /**
+    * @ngdoc function
+    * @methodOf ui.grid.gridMenuService
+    * @name hideableColumnsLength
+    * @description returns the count of the hideable columns in the grid. 
+    * @param {$scope} scope the scope of this gridMenu
+    */
+  var hideableColumnsLength = function (scope) {
+    var columnsLength = 0;
+    scope.grid.options.columnDefs.forEach( function( colDef, index ) {
+      if (colDef.enableHiding !== false) {
+        columnsLength++;
+      }
+    });
+    return columnsLength;
+  };
+
   var service = {
     /**
      * @ngdoc method
@@ -152,6 +169,18 @@ angular.module('ui.grid')
      * some of the management of items for you.
      *
      */
+
+    /**
+     * @ngdoc array
+     * @name alwaysShowGridMenuButton
+     * @propertyOf ui.grid.class:GridOptions
+     * @description (optional) If this is set to false, the grid menu button appears only if there is any grid menu item
+     * in the grid menu. Because grid menu items are generated dynamically, a watcher is set to watch the length of the items.
+     * This evaluation on each digest cycle could be unnecessary, if you always know, that there are menu items to show.
+     * The default value is true.
+     *
+     */
+
     /**
      * @ngdoc boolean
      * @name gridMenuShowHideColumns
@@ -215,6 +244,29 @@ angular.module('ui.grid')
       return menuItems;
     },
 
+    getMenuItemsLength: function($scope) {
+
+      var length = 0;
+
+      if ($scope.grid.options.gridMenuCustomItems && $scope.grid.options.gridMenuCustomItems.length) {
+        length += $scope.grid.options.gridMenuCustomItems.length;
+      }
+
+      if ($scope.grid.options.enableFiltering) {
+        length++;
+      }
+
+      if ($scope.registeredMenuItems && $scope.registeredMenuItems.length) {
+        length += $scope.registeredMenuItems.length;
+      }
+
+      length += hideableColumnsLength($scope);
+
+      return length;
+
+    },
+
+    hideableColumnsLength: hideableColumnsLength,
 
     /**
      * @ngdoc array
@@ -257,14 +309,8 @@ angular.module('ui.grid')
       function getColumnIcon(colDef) {
         return isColumnVisible(colDef) ? 'ui-grid-icon-ok' : 'ui-grid-icon-cancel';
       }
-      var noColumnsToHide = true;
-      $scope.grid.options.columnDefs.forEach( function( colDef, index ){
-        if ( colDef.enableHiding !== false ){
-          noColumnsToHide = false;
-        }
-      } );
 
-      if ( !noColumnsToHide ) {
+      if ( hideableColumnsLength($scope) ) {
 
         // add header for columns
         showHideColumns.push({
@@ -370,6 +416,26 @@ function (gridUtil, uiGridConstants, uiGridGridMenuService, i18nService) {
     require: ['^uiGrid'],
     templateUrl: 'ui-grid/ui-grid-menu-button',
     replace: true,
+
+    controller: ['$scope', function ($scope) {
+
+      if ($scope.grid.options.alwaysShowGridMenuButton !== false) {
+        // always show the grid menu button
+        $scope.showGridMenuButton = true;
+      } else {
+        
+        // show the grid menu button only if there are grid menu items
+        $scope.showGridMenuButton = uiGridGridMenuService.getMenuItemsLength($scope) > 0;
+        
+        // watch the changes on the grid menu items' count.
+        $scope.$watch(function () {
+            return uiGridGridMenuService.getMenuItemsLength($scope) > 0;
+          }, function (newValue) {
+            $scope.showGridMenuButton = newValue;
+          });
+      }
+
+    }],
 
     link: function ($scope, $elm, $attrs, controllers) {
       var uiGridCtrl = controllers[0];
