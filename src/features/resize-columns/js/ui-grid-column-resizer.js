@@ -14,11 +14,95 @@
    */
   var module = angular.module('ui.grid.resizeColumns', ['ui.grid']);
 
-  module.service('uiGridResizeColumnsService', ['gridUtil', '$q', '$rootScope',
-    function (gridUtil, $q, $rootScope) {
-      return {
-        defaultGridOptions: function(gridOptions) {
-          // default option to true unless it was explicitly set to false
+  module.service('uiGridResizeColumnsService', ['gridUtil', 'uiGridConstants', '$q', '$rootScope',
+    function (gridUtil, uiGridConstants, $q, $rootScope) {
+
+      /** This function computes the width of a specified column automatically.
+       *  @param {object} col the uiGridColumn, for which the auto width has to be computed
+       *  @param {object} element any DOM element inside the column render container
+       */
+      var getAutoFitColumnWidth = function (col, element) {
+        // Go through the rendered rows and find out the max size for the data in this column
+        var maxWidth = 0;
+        var xDiff = 0;
+
+        // Get the parent render container element
+        var renderContainerElm = null;
+        if (element) {
+          renderContainerElm = gridUtil.closestElm(element, '.ui-grid-render-container');
+        } else {
+          var renderContainer = col.getRenderContainer();
+          renderContainerElm = $('.ui-grid-render-container-' + renderContainer.name + '[id=' + col.grid.id + '-grid-container]')[0];
+        }
+
+        // Get the cell contents so we measure correctly. For the header cell we have to account for the sort icon and the menu buttons, if present
+        var cells = renderContainerElm.querySelectorAll('.' + uiGridConstants.COL_CLASS_PREFIX + col.uid + ' .ui-grid-cell-contents');
+        
+        var maxLimit = col.grid.options.maxNumberOfRowsForAutoFit;
+        var i = 0;
+        Array.prototype.forEach.call(cells, function (cell) {
+          if (maxLimit === -1 || i++ < maxLimit) {
+            // Get the cell width
+            // gridUtil.logDebug('width', gridUtil.elementWidth(cell));
+
+            // Account for the menu button if it exists
+            var menuButton;
+            if (angular.element(cell).parent().hasClass('ui-grid-header-cell')) {
+              menuButton = angular.element(cell).parent()[0].querySelectorAll('.ui-grid-column-menu-button');
+            }
+
+            gridUtil.fakeElement(cell, {}, function(newElm) {
+              // Make the element float since it's a div and can expand to fill its container
+              var e = angular.element(newElm);
+              e.attr('style', 'float: left');
+
+              var width = gridUtil.elementWidth(e);
+
+              if (menuButton) {
+                var menuButtonWidth = gridUtil.elementWidth(menuButton);
+                width = width + menuButtonWidth;
+              } else {
+                width += 10;
+              }
+
+              if (width > maxWidth) {
+                maxWidth = width;
+              }
+            });
+          }
+        });
+
+        var newWidth = constrainWidth(col, maxWidth); 
+        xDiff = newWidth - col.width;
+
+        // check we're not outside the allowable bounds for this column
+        return { width: newWidth, xDiff: xDiff };
+      };
+
+      var refreshCanvas = function (xDiff, grid) {
+        // Then refresh the grid canvas, rebuilding the styles so that the scrollbar updates its size
+        grid.refreshCanvas(true).then( function() {
+          grid.queueGridRefresh();
+        });
+      };
+
+      var constrainWidth = function (col, width){
+        var newWidth = width;
+
+        // If the new width would be less than the column's allowably minimum width, don't allow it
+        if (col.minWidth && newWidth < col.minWidth) {
+          newWidth = col.minWidth;
+        }
+        else if (col.maxWidth && newWidth > col.maxWidth) {
+          newWidth = col.maxWidth;
+        }
+
+        return newWidth;
+      };
+
+      var service = {
+        defaultGridOptions: function(gridOptions){
+          //default option to true unless it was explicitly set to false
           /**
            *  @ngdoc object
            *  @name ui.grid.resizeColumns.api:GridOptions
@@ -36,9 +120,27 @@
            */
           gridOptions.enableColumnResizing = gridOptions.enableColumnResizing !== false;
 
-          // legacy support
-          // use old name if it is explicitly false
-          if (gridOptions.enableColumnResize === false) {
+          /**
+           *  @ngdoc object
+           *  @name enableColumnAutoFit
+           *  @propertyOf  ui.grid.resizeColumns.api:GridOptions
+           *  @description Enable column auto width computing for columns with undefined widths on the entire grid
+           *  <br/>Defaults to true
+           */
+          gridOptions.enableColumnAutoFit = gridOptions.enableColumnAutoFit !== false;
+
+          /**
+           *  @ngdoc object
+           *  @name maxNumberOfRowsForAutoFit
+           *  @propertyOf  ui.grid.resizeColumns.api:GridOptions
+           *  @description this option specifies how many rows in a column should be maximally processed to compute the 
+           *  auto width of that column. Default is -1 for unlimited.
+           */
+          gridOptions.maxNumberOfRowsForAutoFit = typeof gridOptions.maxNumberOfRowsForAutoFit !== "undefined" ? gridOptions.maxNumberOfRowsForAutoFit : -1;
+
+          //legacy support
+          //use old name if it is explicitly false
+          if (gridOptions.enableColumnResize === false){
             gridOptions.enableColumnResizing = false;
           }
         },
@@ -64,6 +166,15 @@
           // default to true unless gridOptions or colDef is explicitly false
           colDef.enableColumnResizing = colDef.enableColumnResizing === undefined ? gridOptions.enableColumnResizing : colDef.enableColumnResizing;
 
+          /**
+           *  @ngdoc object
+           *  @name enableColumnAutoFit
+           *  @propertyOf  ui.grid.resizeColumns.api:ColumnDef
+           *  @description Enable column auto width computing on an individual column if its width is set to undefined
+           *  <br/>Defaults to GridOptions.enableColumnResizing
+           */
+          //default to true unless gridOptions or colDef is explicitly false
+          colDef.enableColumnAutoFit = colDef.enableColumnAutoFit === undefined ? gridOptions.enableColumnAutoFit : colDef.enableColumnAutoFit;
 
           // legacy support of old option name
           if (colDef.enableColumnResize === false) {
@@ -72,6 +183,45 @@
 
           return $q.all(promises);
         },
+
+        getAutoFitColumnWidth: getAutoFitColumnWidth,
+
+        /**
+         * This function is called when new columns have been added to the grid. It iterates over all visible columns with the property enableColumnAutoFit set to true,
+         * and which do not have any width assigned to yet.
+         */
+        autoResizeNewColumns: function (grid) {
+          
+          grid.columns.forEach(function (column) {
+              if (column.colDef.enableColumnAutoFit && column.colDef.width === undefined && column.visible) {
+
+                setTimeout(function() {
+
+                  var widthInfo = getAutoFitColumnWidth(column);
+
+                  column.width = widthInfo.width;
+                  column.colDef.width = column.width;
+                  // hasCustomWidth is set only when the user changes the width himself by mouse move or double clicking
+                  column.hasCustomWidth = false;
+                  // we set the new property hasAutoWidth to true in this case instead.
+                  column.hasAutoWidth = true;
+                  column.colDef.hasAutoWidth = true;
+
+                  refreshCanvas(widthInfo.xDiff, column.grid);
+
+                }, 0);
+                  
+              }
+          });
+        },
+
+        // Refresh the grid canvas
+        // takes an argument representing the diff along the X-axis that the resize had
+        refreshCanvas: refreshCanvas, 
+
+        // Check that the requested width isn't wider than the maxWidth, or narrower than the minWidth
+        // Returns the new recommended with, after constraints applied
+        constrainWidth: constrainWidth, 
 
         registerPublicApi: function (grid) {
             /**
@@ -164,7 +314,7 @@
    </doc:scenario>
    </doc:example>
    */
-  module.directive('uiGridResizeColumns', ['gridUtil', 'uiGridResizeColumnsService', function (gridUtil, uiGridResizeColumnsService) {
+  module.directive('uiGridResizeColumns', ['gridUtil', 'uiGridConstants', 'uiGridResizeColumnsService', function (gridUtil, uiGridConstants, uiGridResizeColumnsService) {
     return {
       replace: true,
       priority: 0,
@@ -174,7 +324,8 @@
         return {
           pre: function ($scope, $elm, $attrs, uiGridCtrl) {
             uiGridResizeColumnsService.defaultGridOptions(uiGridCtrl.grid.options);
-            uiGridCtrl.grid.registerColumnBuilder( uiGridResizeColumnsService.colResizerColumnBuilder);
+            uiGridCtrl.grid.registerColumnBuilder(uiGridResizeColumnsService.colResizerColumnBuilder);
+            uiGridCtrl.grid.registerDataChangeCallback(uiGridResizeColumnsService.autoResizeNewColumns, [uiGridConstants.dataChange.COLUMN]);
             uiGridResizeColumnsService.registerPublicApi(uiGridCtrl.grid);
           },
           post: function ($scope, $elm, $attrs, uiGridCtrl) {
@@ -324,32 +475,6 @@
           $elm.addClass('right');
         }
 
-        // Refresh the grid canvas
-        //   takes an argument representing the diff along the X-axis that the resize had
-        function refreshCanvas(xDiff) {
-          // Then refresh the grid canvas, rebuilding the styles so that the scrollbar updates its size
-          uiGridCtrl.grid.refreshCanvas(true).then( function() {
-            uiGridCtrl.grid.queueGridRefresh();
-          });
-        }
-
-        // Check that the requested width isn't wider than the maxWidth, or narrower than the minWidth
-        // Returns the new recommended with, after constraints applied
-        function constrainWidth(col, width) {
-          var newWidth = width;
-
-          // If the new width would be less than the column's allowably minimum width, don't allow it
-          if (col.minWidth && newWidth < col.minWidth) {
-            newWidth = col.minWidth;
-          }
-          else if (col.maxWidth && newWidth > col.maxWidth) {
-            newWidth = col.maxWidth;
-          }
-
-          return newWidth;
-        }
-
-
         /*
          * Our approach to event handling aims to deal with both touch devices and mouse devices
          * We register down handlers on both touch and mouse.  When a touchstart or mousedown event
@@ -385,7 +510,7 @@
           var newWidth = parseInt(col.drawnWidth + xDiff * rtlMultiplier, 10);
 
           // check we're not outside the allowable bounds for this column
-          x = x + ( constrainWidth(col, newWidth) - newWidth ) * rtlMultiplier;
+          x = x + ( uiGridResizeColumnsService.constrainWidth(col, newWidth) - newWidth ) * rtlMultiplier;
 
           resizeOverlay.css({ left: x + 'px' });
 
@@ -424,10 +549,10 @@
           var newWidth = parseInt(col.drawnWidth + xDiff * rtlMultiplier, 10);
 
           // check we're not outside the allowable bounds for this column
-          col.width = constrainWidth(col, newWidth);
+          col.width = uiGridResizeColumnsService.constrainWidth(col, newWidth);
           col.hasCustomWidth = true;
 
-          refreshCanvas(xDiff);
+          uiGridResizeColumnsService.refreshCanvas(xDiff, uiGridCtrl.grid);
 
           uiGridResizeColumnsService.fireColumnSizeChanged(uiGridCtrl.grid, col.colDef, xDiff);
 
@@ -487,7 +612,6 @@
 
         onDownEvents();
 
-
         // On doubleclick, resize to fit all rendered cells
         var dblClickFn = function(event, args) {
           event.stopPropagation();
@@ -499,51 +623,15 @@
             return;
           }
 
-          // Go through the rendered rows and find out the max size for the data in this column
-          var maxWidth = 0;
-
-          // Get the parent render container element
-          var renderContainerElm = gridUtil.closestElm($elm, '.ui-grid-render-container');
-
-          // Get the cell contents so we measure correctly. For the header cell we have to account for the sort icon and the menu buttons, if present
-          var cells = renderContainerElm.querySelectorAll('.' + uiGridConstants.COL_CLASS_PREFIX + col.uid + ' .ui-grid-cell-contents');
-          Array.prototype.forEach.call(cells, function (cell) {
-              // Get the cell width
-              // gridUtil.logDebug('width', gridUtil.elementWidth(cell));
-
-              // Account for the menu button if it exists
-              var menuButton;
-              if (angular.element(cell).parent().hasClass('ui-grid-header-cell')) {
-                menuButton = angular.element(cell).parent()[0].querySelectorAll('.ui-grid-column-menu-button');
-              }
-
-              gridUtil.fakeElement(cell, {}, function(newElm) {
-                // Make the element float since it's a div and can expand to fill its container
-                var e = angular.element(newElm);
-                e.attr('style', 'float: left');
-
-                var width = gridUtil.elementWidth(e);
-
-                if (menuButton) {
-                  var menuButtonWidth = gridUtil.elementWidth(menuButton);
-                  width = width + menuButtonWidth;
-                }
-
-                if (width > maxWidth) {
-                  maxWidth = width;
-                }
-              });
-            });
-
-          // check we're not outside the allowable bounds for this column
-          var newWidth = constrainWidth(col, maxWidth);
-          var xDiff = newWidth - col.drawnWidth;
-          col.width = newWidth;
+          var widthInfo = uiGridResizeColumnsService.getAutoFitColumnWidth(col, $elm);
+          
+          col.width = widthInfo.width;
           col.hasCustomWidth = true;
 
-          refreshCanvas(xDiff);
+          uiGridResizeColumnsService.refreshCanvas(widthInfo.xDiff, uiGridCtrl.grid);
 
-          uiGridResizeColumnsService.fireColumnSizeChanged(uiGridCtrl.grid, col.colDef, xDiff);        };
+          uiGridResizeColumnsService.fireColumnSizeChanged(uiGridCtrl.grid, col.colDef, widthInfo.xDiff);        
+        };
         $elm.on('dblclick', dblClickFn);
 
         $elm.on('$destroy', function() {

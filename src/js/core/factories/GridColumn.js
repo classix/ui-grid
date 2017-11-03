@@ -476,7 +476,7 @@ angular.module('ui.grid')
     if (!angular.isNumber(self.width) || !self.hasCustomWidth || colDef.allowCustomWidthOverride) {
       var colDefWidth = colDef.width;
       var parseErrorMsg = "Cannot parse column width '" + colDefWidth + "' for column named '" + colDef.name + "'";
-      self.hasCustomWidth = false;
+      //self.hasCustomWidth = false;
 
       if (!angular.isString(colDefWidth) && !angular.isNumber(colDefWidth)) {
         self.width = '*';
