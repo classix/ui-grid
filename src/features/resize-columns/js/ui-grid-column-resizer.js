@@ -46,9 +46,9 @@
             // gridUtil.logDebug('width', gridUtil.elementWidth(cell));
 
             // Account for the menu button if it exists
-            var menuButton;
-            if (angular.element(cell).parent().hasClass('ui-grid-header-cell')) {
-              menuButton = angular.element(cell).parent()[0].querySelectorAll('.ui-grid-column-menu-button');
+            var menuButton = false;
+            if (angular.element(cell).parent().parent().hasClass('ui-grid-header-cell')) {
+              menuButton = angular.element(cell).parent().parent()[0].querySelectorAll('.ui-grid-column-menu-button');
             }
 
             gridUtil.fakeElement(cell, {}, function(newElm) {
@@ -59,10 +59,9 @@
               var width = gridUtil.elementWidth(e);
 
               if (menuButton) {
-                var menuButtonWidth = gridUtil.elementWidth(menuButton);
-                width = width + menuButtonWidth;
+                width += 35; // This is a header, so add a padding for sort information and menu button
               } else {
-                width += 10;
+                width += 10; // For lists without a header add a padding for IE.
               }
 
               if (width > maxWidth) {
