@@ -29,33 +29,49 @@
     return {
       require: 'uiGrid',
       scope: false,
-      link: function($scope, $elm, $attrs, uiGridCtrl) {
-        var debouncedRefresh;
+      link: function ($scope, $elm, $attrs, uiGridCtrl) {
+        var prevGridWidth, prevGridHeight;
 
         function getDimensions() {
-          return {
-            width: gridUtil.elementWidth($elm),
-            height: gridUtil.elementHeight($elm)
-          };
+          prevGridHeight = $elm.outerHeight();
+          prevGridWidth = $elm.outerWidth();
         }
 
-        function refreshGrid(prevWidth, prevHeight, width, height) {
-          if ($elm[0].offsetParent !== null) {
-            uiGridCtrl.grid.gridWidth = width;
-            uiGridCtrl.grid.gridHeight = height;
-            uiGridCtrl.grid.queueGridRefresh()
-              .then(function() {
-                uiGridCtrl.grid.api.core.raise.gridDimensionChanged(prevHeight, prevWidth, height, width);
+        // Initialize the dimensions
+        getDimensions();
+
+        var resizeTimeoutId;
+        function startTimeout() {
+          clearTimeout(resizeTimeoutId);
+
+          resizeTimeoutId = setTimeout(function () {
+            var newGridHeight = $elm.outerHeight();
+            var newGridWidth = $elm.outerWidth();
+
+            if (newGridHeight !== prevGridHeight || newGridWidth !== prevGridWidth) {
+              uiGridCtrl.grid.gridHeight = newGridHeight;
+              uiGridCtrl.grid.gridWidth = newGridWidth;
+              uiGridCtrl.grid.api.core.raise.gridDimensionChanged(prevGridHeight, prevGridWidth, newGridHeight, newGridWidth);
+
+              $scope.$apply(function () {
+                uiGridCtrl.grid.refresh()
+                  .then(function () {
+                    getDimensions();
+
+                    startTimeout();
+                  });
               });
-          }
+            }
+            else {
+              startTimeout();
+            }
+          }, 250);
         }
 
-        debouncedRefresh = gridUtil.debounce(refreshGrid, 400);
+        startTimeout();
 
-        $scope.$watchCollection(getDimensions, function(newValues, oldValues) {
-          if (!angular.equals(newValues, oldValues)) {
-            debouncedRefresh(oldValues.width, oldValues.height, newValues.width, newValues.height);
-          }
+        $scope.$on('$destroy', function() {
+          clearTimeout(resizeTimeoutId);
         });
       }
     };
