@@ -15,10 +15,7 @@
         ng-click="pageFirstPageClick()"
         ng-disabled="cantPageBackward()">
         <div
-          ng-class="grid.isRTL() ? 'last-triangle' : 'first-triangle'">
-          <div
-            ng-class="grid.isRTL() ? 'last-bar-rtl' : 'first-bar'">
-          </div>
+          ng-class="grid.isRTL() ? 'ui-grid-icon ui-grid-icon-first-rtl' : 'ui-grid-icon ui-grid-icon-first'">
         </div>
       </button>
       <button
@@ -28,7 +25,7 @@
         ui-grid-one-bind-aria-label="aria.pageBack"
         ng-click="pagePreviousPageClick()"
         ng-disabled="cantPageBackward()">
-        <div ng-class="grid.isRTL() ? 'last-triangle prev-triangle' : 'first-triangle prev-triangle'"></div>
+        <div ng-class="grid.isRTL() ? 'ui-grid-icon ui-grid-icon-right-dir' : 'ui-grid-icon ui-grid-icon-left-dir'"></div>
       </button>
       <input
         type="number"
@@ -56,7 +53,7 @@
         ui-grid-one-bind-aria-label="aria.pageForward"
         ng-click="pageNextPageClick()"
         ng-disabled="cantPageForward()">
-        <div ng-class="grid.isRTL() ? 'first-triangle next-triangle' : 'last-triangle next-triangle'"></div>
+        <div ng-class="grid.isRTL() ? 'ui-grid-icon ui-grid-icon-left-dir' : 'ui-grid-icon ui-grid-icon-right-dir'"></div>
       </button>
       <button
         type="button"
@@ -65,9 +62,7 @@
         ui-grid-one-bind-aria-label="aria.pageToLast"
         ng-click="pageLastPageClick()"
         ng-disabled="cantPageToLast()">
-        <div ng-class="grid.isRTL() ? 'first-triangle' : 'last-triangle'">
-          <div ng-class="grid.isRTL() ? 'first-bar-rtl' : 'last-bar'">
-          </div>
+        <div ng-class="grid.isRTL() ? 'ui-grid-icon ui-grid-icon-last-rtl' : 'ui-grid-icon ui-grid-icon-last'">
         </div>
       </button>
     </div>
