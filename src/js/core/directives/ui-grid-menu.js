@@ -225,8 +225,9 @@ function ($compile, $timeout, $window, $document, gridUtil, uiGridConstants, i18
   };
 }])
 
-.directive('uiGridMenuItem', ['gridUtil', '$compile', 'i18nService', function (gridUtil, $compile, i18nService) {
-  return {
+.directive('uiGridMenuItem', ['gridUtil', '$compile', 'i18nService', 'uiGridConstants',
+function (gridUtil, $compile, i18nService, uiGridConstants) {
+  var uiGridMenuItem = {
     priority: 0,
     scope: {
       name: '=',
@@ -312,7 +313,13 @@ function ($compile, $timeout, $window, $document, gridUtil, uiGridConstants, i18
             }
           };
 
-          $scope.label = function() {
+          $scope.checkKeyUp = function($event) {
+            if ($event.keyCode === uiGridConstants.keymap.ESC) {
+              $scope.$parent.hideMenu();
+            }
+          };
+
+          $scope.label = function(){
             var toBeDisplayed = $scope.name;
 
             if (typeof($scope.name) === 'function') {

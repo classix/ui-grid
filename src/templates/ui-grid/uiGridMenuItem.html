@@ -2,6 +2,7 @@
   type="button"
   class="ui-grid-menu-item"
   ng-click="itemAction($event, title)"
+  ng-keyup="checkKeyUp($event)"
   ng-show="itemShown()"
   ng-class="{ 'ui-grid-menu-item-active': active(), 'ui-grid-sr-only': (!focus && screenReaderOnly) }"
   tabindex="0"
