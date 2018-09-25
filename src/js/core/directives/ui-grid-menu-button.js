@@ -11,7 +11,7 @@ angular.module('ui.grid')
 
    /**
     * @ngdoc function
-    * @methodOf ui.grid.gridMenuService
+    * @methodOf ui.grid.uiGridGridMenuService
     * @name hideableColumnsLength
     * @description returns the count of the hideable columns in the grid. 
     * @param {$scope} scope the scope of this gridMenu
@@ -346,7 +346,7 @@ angular.module('ui.grid')
             };
             service.setMenuItemTitle( menuItem, colDef, $scope.grid );
             showHideColumns.push( menuItem );
-		  }
+          }
         });
       }
 
