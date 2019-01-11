@@ -13,7 +13,7 @@ angular.module('ui.grid')
     * @ngdoc function
     * @methodOf ui.grid.uiGridGridMenuService
     * @name hideableColumnsLength
-    * @description returns the count of the hideable columns in the grid. 
+    * @description returns the count of the hideable columns in the grid.
     * @param {$scope} scope the scope of this gridMenu
     */
   var hideableColumnsLength = function (scope) {
@@ -320,8 +320,8 @@ angular.module('ui.grid')
 
         $scope.grid.options.gridMenuTitleFilter = $scope.grid.options.gridMenuTitleFilter ? $scope.grid.options.gridMenuTitleFilter : function( title ) { return title; };
 
-        $scope.grid.options.columnDefs.forEach( function( colDef, index ){
-          if ( colDef.enableHiding !== false ){
+        $scope.grid.options.columnDefs.forEach( function( colDef, index ) {
+          if ( colDef.enableHiding !== false ) {
             // add hide menu item - shows an OK icon as we only show when column is already visible
             var menuItem = {
               icon: getColumnIcon(colDef),
@@ -423,10 +423,8 @@ function (gridUtil, uiGridConstants, uiGridGridMenuService, i18nService) {
         // always show the grid menu button
         $scope.showGridMenuButton = true;
       } else {
-        
         // show the grid menu button only if there are grid menu items
         $scope.showGridMenuButton = uiGridGridMenuService.getMenuItemsLength($scope) > 0;
-        
         // watch the changes on the grid menu items' count.
         $scope.$watch(function () {
             return uiGridGridMenuService.getMenuItemsLength($scope) > 0;
@@ -464,7 +462,7 @@ function (gridUtil, uiGridConstants, uiGridGridMenuService, i18nService) {
         if (event.keyCode === uiGridConstants.keymap.ENTER || event.keyCode === uiGridConstants.keymap.SPACE) {
           event.preventDefault();
           $scope.toggleMenu();
-        } 
+        }
       };
 
       $scope.$on('menu-hidden', function() {

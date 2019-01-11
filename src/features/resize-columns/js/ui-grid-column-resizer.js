@@ -37,7 +37,6 @@
 
         // Get the cell contents so we measure correctly. For the header cell we have to account for the sort icon and the menu buttons, if present
         var cells = renderContainerElm.querySelectorAll('.' + uiGridConstants.COL_CLASS_PREFIX + col.uid + ' .ui-grid-cell-contents');
-        
         var maxLimit = col.grid.options.maxNumberOfRowsForAutoFit;
         var i = 0;
         Array.prototype.forEach.call(cells, function (cell) {
@@ -71,7 +70,7 @@
           }
         });
 
-        var newWidth = constrainWidth(col, maxWidth); 
+        var newWidth = constrainWidth(col, maxWidth);
         xDiff = newWidth - col.width;
 
         // check we're not outside the allowable bounds for this column
@@ -85,7 +84,7 @@
         });
       };
 
-      var constrainWidth = function (col, width){
+      var constrainWidth = function (col, width) {
         var newWidth = width;
 
         // If the new width would be less than the column's allowably minimum width, don't allow it
@@ -100,8 +99,8 @@
       };
 
       var service = {
-        defaultGridOptions: function(gridOptions){
-          //default option to true unless it was explicitly set to false
+        defaultGridOptions: function(gridOptions) {
+          // default option to true unless it was explicitly set to false
           /**
            *  @ngdoc object
            *  @name ui.grid.resizeColumns.api:GridOptions
@@ -132,14 +131,14 @@
            *  @ngdoc object
            *  @name maxNumberOfRowsForAutoFit
            *  @propertyOf  ui.grid.resizeColumns.api:GridOptions
-           *  @description this option specifies how many rows in a column should be maximally processed to compute the 
+           *  @description this option specifies how many rows in a column should be maximally processed to compute the
            *  auto width of that column. Default is -1 for unlimited.
            */
           gridOptions.maxNumberOfRowsForAutoFit = typeof gridOptions.maxNumberOfRowsForAutoFit !== "undefined" ? gridOptions.maxNumberOfRowsForAutoFit : -1;
 
-          //legacy support
-          //use old name if it is explicitly false
-          if (gridOptions.enableColumnResize === false){
+          // legacy support
+          // use old name if it is explicitly false
+          if (gridOptions.enableColumnResize === false) {
             gridOptions.enableColumnResizing = false;
           }
         },
@@ -172,7 +171,7 @@
            *  @description Enable column auto width computing on an individual column if its width is set to undefined
            *  <br/>Defaults to GridOptions.enableColumnResizing
            */
-          //default to true unless gridOptions or colDef is explicitly false
+          // default to true unless gridOptions or colDef is explicitly false
           colDef.enableColumnAutoFit = colDef.enableColumnAutoFit === undefined ? gridOptions.enableColumnAutoFit : colDef.enableColumnAutoFit;
 
           // legacy support of old option name
@@ -190,7 +189,7 @@
          * and which do not have any width assigned to yet.
          */
         autoResizeNewColumns: function (grid) {
-          
+
           grid.columns.forEach(function (column) {
               if (column.colDef.enableColumnAutoFit && column.colDef.width === undefined && column.visible) {
 
@@ -207,20 +206,17 @@
                   column.colDef.hasAutoWidth = true;
 
                   refreshCanvas(widthInfo.xDiff, column.grid);
-
                 }, 0);
-                  
               }
           });
         },
 
         // Refresh the grid canvas
         // takes an argument representing the diff along the X-axis that the resize had
-        refreshCanvas: refreshCanvas, 
-
+        refreshCanvas: refreshCanvas,
         // Check that the requested width isn't wider than the maxWidth, or narrower than the minWidth
         // Returns the new recommended with, after constraints applied
-        constrainWidth: constrainWidth, 
+        constrainWidth: constrainWidth,
 
         registerPublicApi: function (grid) {
             /**
@@ -623,13 +619,13 @@
           }
 
           var widthInfo = uiGridResizeColumnsService.getAutoFitColumnWidth(col, $elm);
-          
+
           col.width = widthInfo.width;
           col.hasCustomWidth = true;
 
           uiGridResizeColumnsService.refreshCanvas(widthInfo.xDiff, uiGridCtrl.grid);
 
-          uiGridResizeColumnsService.fireColumnSizeChanged(uiGridCtrl.grid, col.colDef, widthInfo.xDiff);        
+          uiGridResizeColumnsService.fireColumnSizeChanged(uiGridCtrl.grid, col.colDef, widthInfo.xDiff);
         };
         $elm.on('dblclick', dblClickFn);
 

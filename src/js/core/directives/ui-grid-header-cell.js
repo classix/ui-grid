@@ -63,7 +63,7 @@
 
             $scope.grid = uiGridCtrl.grid;
 
-            $scope.showColMenuButton = $scope.grid.options.enableColumnMenus && $scope.grid.options.showColumnMenuButtons && 
+            $scope.showColMenuButton = $scope.grid.options.enableColumnMenus && $scope.grid.options.showColumnMenuButtons &&
             !$scope.col.isRowHeader && $scope.col.colDef.enableColumnMenu !== false && $scope.col.colDef.showColumnMenuButton !== false;
 
             $scope.renderContainer = uiGridCtrl.grid.renderContainers[renderContainerCtrl.containerId];
@@ -164,18 +164,18 @@
               }
             };
 
-            $scope.spaceAction =  typeof($scope.col.grid.options.columnHeaderSpaceAction) !== "undefined" ? 
+            $scope.spaceAction =  typeof($scope.col.grid.options.columnHeaderSpaceAction) !== "undefined" ?
               $scope.col.grid.options.columnHeaderSpaceAction : $scope.col.grid.options.columnHeaderKeyDownAction;
-            $scope.returnAction =  typeof($scope.col.grid.options.columnHeaderReturnAction) !== "undefined" ? 
+            $scope.returnAction =  typeof($scope.col.grid.options.columnHeaderReturnAction) !== "undefined" ?
               $scope.col.grid.options.columnHeaderReturnAction : $scope.col.grid.options.columnHeaderKeyDownAction;
 
-            if ($scope.returnAction === uiGridConstants.keyboardActions.SHOW_MENU || 
+            if ($scope.returnAction === uiGridConstants.keyboardActions.SHOW_MENU ||
               $scope.spaceAction === uiGridConstants.keyboardActions.SHOW_MENU) {
               $elm.find('.ui-grid-cell-contents').attr('aria-haspopup', 'true');
             }
 
             $scope.handleKeyDown = function(event) {
-              
+
               var performeKeyDownAction = function(action) {
 
                 event.preventDefault();

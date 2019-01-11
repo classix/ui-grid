@@ -380,9 +380,9 @@ function ($timeout, gridUtil, uiGridConstants, uiGridColumnMenuService, $documen
           $scope.hideMenu( true );
 
           if ($scope.col && $scope.col.visible) {
-            //Focus on the menu button if this is shown, otherwise focus the column header
+            // Focus on the menu button if this is shown, otherwise focus the column header
             var elementToFocus = '.ui-grid-header-cell.' + $scope.col.getColClass();
-            elementToFocus += ($scope.grid.options.showColumnMenuButtons && $scope.col.colDef.showColumnMenuButton !== false) ? 
+            elementToFocus += ($scope.grid.options.showColumnMenuButtons && $scope.col.colDef.showColumnMenuButton !== false) ?
               ' .ui-grid-column-menu-button' : ' .ui-grid-header-cell-primary-focus';
             gridUtil.focus.bySelector($document, elementToFocus, $scope.col.grid, false);
           }

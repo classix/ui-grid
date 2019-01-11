@@ -125,7 +125,7 @@
          *  @ngdoc object
          *  @name enableColumnOrderVerification
          *  @propertyOf  ui.grid.moveColumns.api:GridOptions
-         *  @description If false, disables the build-in column order verification and lets the user handle it. 
+         *  @description If false, disables the build-in column order verification and lets the user handle it.
          *  Turning this off can be useful with external paging. Defaults to true.
          */
         gridOptions.enableColumnOrderVerification = gridOptions.enableColumnOrderVerification !== false;
@@ -165,7 +165,7 @@
        * @description dataChangeCallback which uses the cached column order to restore the column order
        * when it is reset by altering the columnDefs array.
        */
-      verifyColumnOrder: function(grid){
+      verifyColumnOrder: function(grid) {
 
         if (!grid.options.enableColumnOrderVerification) {
           return;
@@ -194,7 +194,7 @@
           return;
         }
 
-        //check columns in between move-range to make sure they are visible columns
+        // check columns in between move-range to make sure they are visible columns
         var pos = (originalPosition < newPosition) ? originalPosition + 1 : originalPosition - 1;
         var i0 = Math.min(pos, newPosition);
         for (i0; i0 <= Math.max(pos, newPosition); i0++) {

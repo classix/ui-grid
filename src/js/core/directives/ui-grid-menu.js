@@ -319,7 +319,7 @@ function (gridUtil, $compile, i18nService, uiGridConstants) {
             }
           };
 
-          $scope.label = function(){
+          $scope.label = function() {
             var toBeDisplayed = $scope.name;
 
             if (typeof($scope.name) === 'function') {

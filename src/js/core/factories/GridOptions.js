@@ -418,10 +418,10 @@ angular.module('ui.grid')
        * @ngdoc boolean
        * @name showColumnMenuButtons
        * @propertyOf ui.grid.class:GridOptions
-       * @description True by default. When enabled, this setting displays a button within 
+       * @description True by default. When enabled, this setting displays a button within
        * each column header that displays the column menu.
        */
-      baseOptions.showColumnMenuButtons = baseOptions.showColumnMenuButtons !== false; 
+      baseOptions.showColumnMenuButtons = baseOptions.showColumnMenuButtons !== false;
 
       /**
        * @ngdoc boolean
@@ -576,7 +576,7 @@ angular.module('ui.grid')
        * @ngdoc object
        * @name columnHeaderKeyDownAction
        * @propertyOf ui.grid.class:GridOptions
-       * @description this option specifies the action to be performed, when the space bar or the return key is 
+       * @description this option specifies the action to be performed, when the space bar or the return key is
        * pressed on a column header. This option takes a value of the enum uiGridConstants.keyboardActions.
        * This option can be overwritten by the options columnHeaderSpaceAction and columnHeaderReturnAction
        */
@@ -611,7 +611,7 @@ angular.module('ui.grid')
        * @propertyOf ui.grid.class:GridOptions
        * @description this option specifies whether the sorting information of columns should always be changed, when the the sorting information
        * in the corresponding column definitions has been changed. Per default, this option is set to false and sorting information is only taken from
-       * the definitions on columns creation. Changing this option to true could be however useful in some cases of external sorting. 
+       * the definitions on columns creation. Changing this option to true could be however useful in some cases of external sorting.
        */
       baseOptions.applySortOnColDefChange = typeof baseOptions.applySortOnColDefChange !== 'undefined' ? baseOptions.applySortOnColDefChange : false;
 
