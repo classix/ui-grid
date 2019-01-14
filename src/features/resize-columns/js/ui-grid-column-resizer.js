@@ -32,7 +32,7 @@
           renderContainerElm = gridUtil.closestElm(element, '.ui-grid-render-container');
         } else {
           var renderContainer = col.getRenderContainer();
-          renderContainerElm = $('.ui-grid-render-container-' + renderContainer.name + '[id=' + col.grid.id + '-grid-container]')[0];
+          renderContainerElm = $('.ui-grid-render-container-' + renderContainer.name + '[id=' + col.grid.id + '-' + renderContainer.name + '-grid-container]')[0];
         }
 
         // Get the cell contents so we measure correctly. For the header cell we have to account for the sort icon and the menu buttons, if present

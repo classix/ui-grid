@@ -212,11 +212,9 @@ describe('GridOptions factory', function () {
         gridFooterTemplate: 'testGridFooter',
         rowTemplate: 'testRow',
         gridMenuTemplate: 'testGridMenu',
-        extraOption: 'testExtraOption'
+        extraOption: 'testExtraOption',
         menuButtonTemplate: 'testMenuButton',
         menuItemTemplate: 'testMenuItem',
-        extraOption: 'testExtraOption'
-        extraOption: 'testExtraOption',
         columnHeaderKeyDownAction: 1,
         columnHeaderSpaceAction: 2,
         columnHeaderReturnAction: 0,
