@@ -227,7 +227,7 @@ function ($compile, $timeout, $window, $document, gridUtil, uiGridConstants, i18
 
 .directive('uiGridMenuItem', ['gridUtil', '$compile', 'i18nService', 'uiGridConstants',
 function (gridUtil, $compile, i18nService, uiGridConstants) {
-  var uiGridMenuItem = {
+  return {
     priority: 0,
     scope: {
       name: '=',
