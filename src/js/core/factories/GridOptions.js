@@ -425,6 +425,15 @@ angular.module('ui.grid')
 
       /**
        * @ngdoc boolean
+       * @name useCustomGridMenu
+       * @propertyOf ui.grid.class:GridOptions
+       * @description False by default. When enabled, only the grid menu button is shown and the user handels the click event of the
+       * grid button himself.
+       */
+      baseOptions.useCustomGridMenu = !!baseOptions.useCustomGridMenu;
+
+      /**
+       * @ngdoc boolean
        * @name enableVerticalScrollbar
        * @propertyOf ui.grid.class:GridOptions
        * @description {@link ui.grid.service:uiGridConstants#properties_scrollbars uiGridConstants.scrollbars.ALWAYS} by default.
