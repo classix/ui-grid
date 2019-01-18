@@ -89,6 +89,15 @@ angular.module('ui.grid')
        *
        */
       grid.api.registerMethod( 'core', 'removeFromGridMenu', service.removeFromGridMenu );
+
+      /**
+       * @ngdoc function
+       * @name toggleColumnVisibility
+       * @methodOf ui.grid.api:PublicApi
+       * @description Shows or hides a column
+       * @param {Column} gridCol the column to show or hide
+       */
+      grid.api.registerMethod( 'core', 'toggleColumnVisibility', service.toggleColumnVisibility);
     },
 
 
