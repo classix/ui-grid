@@ -470,7 +470,18 @@ function (gridUtil, uiGridConstants, uiGridGridMenuService, i18nService) {
       $scope.handleKeyDown = function (event) {
         if (event.keyCode === uiGridConstants.keymap.ENTER || event.keyCode === uiGridConstants.keymap.SPACE) {
           event.preventDefault();
-          $scope.toggleMenu();
+          if (!$scope.grid.options.useCustomGridMenu) {
+            $scope.toggleMenu();
+          } else {
+            var button = $elm.find('.ui-grid-icon-container');
+            // using jQuery is not evil, its smart.
+            var clickEvent = jQuery.Event("click");
+            var offset = button.offset();
+            clickEvent.pageX = offset.left + 2;
+            clickEvent.pageY = offset.top + 2;
+            clickEvent.button = 0;
+            button.trigger(clickEvent);
+          }
         }
       };
 
